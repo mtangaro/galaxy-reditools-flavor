@@ -1,0 +1,48 @@
+---
+# Install Reditools on galaxy image recipe.
+
+- hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+
+  - pip: 
+      name: "{{ item }}"
+    with_items:
+      - cython==0.20.1
+      - numpy
+      - pysam==0.7.8
+      - fisher
+
+  - get_url:
+      url: "http://sourceforge.net/projects/reditools/files/REDItools-1.0.4.tar.gz"
+      dest: /opt/
+
+  - unarchive:
+      src: "/opt/REDItools-1.0.4.tar.gz"
+      dest: /opt
+
+  - command: "python setup.py install"
+    args:
+      chdir: /opt/REDItools-1.0.4
+
+  - git:
+      repo: "https://github.com/mtangaro/galaxy-reditools.git"
+      dest: "/home/galaxy/galaxy/tools/reditools"
+
+  - copy:
+      src: "/home/galaxy/galaxy/config/tool_conf.xml.sample"
+      dest: "/home/galaxy/galaxy/config/tool_conf.xml"
+
+  - blockinfile:
+      dest: "/home/galaxy/galaxy/config/tool_conf.xml"
+      marker: "<!-- {mark} Reditools -->"
+      insertbefore: "</toolbox>"
+      block: |
+        <section id="reditools" name="REDITools">
+          <tool file="reditools/REDItoolDnaRna-wrapper-v0.1/REDItoolDnaRna_wrapper.xml" />
+          <tool file="reditools/reditools-collections/reditools_wrapper.xml" />
+          <tool file="reditools/reditools-paired-collections/reditools_wrapper.xml" />
+          <tool file="reditools/reditools-devel/reditools_wrapper.xml" />
+        </section>
