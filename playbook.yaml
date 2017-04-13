@@ -30,10 +30,13 @@
   - git:
       repo: "https://github.com/mtangaro/galaxy-reditools.git"
       dest: "/home/galaxy/galaxy/tools/reditools"
+    become_user: "galaxy"
+    become: true
 
   - copy:
       src: "/home/galaxy/galaxy/config/tool_conf.xml.sample"
       dest: "/home/galaxy/galaxy/config/tool_conf.xml"
+      owner: "galaxy"
 
   - blockinfile:
       dest: "/home/galaxy/galaxy/config/tool_conf.xml"
@@ -46,3 +49,5 @@
           <tool file="reditools/reditools-paired-collections/reditools_wrapper.xml" />
           <tool file="reditools/reditools-devel/reditools_wrapper.xml" />
         </section>
+    become_user: "galaxy"
+    become: true
